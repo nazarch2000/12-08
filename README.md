@@ -55,6 +55,7 @@ ssh $ssh_restore 'pg_restore -U $dbUser $database $pathB/$dump_file'
 
 3.1. С помощью официальной документации приведите пример команды инкрементного резервного копирования базы данных MySQL. 
 ```
+#делаем полный бэкап
 mysqldump --flush-logs --delete-master-logs --single-transaction --all-databases sakila > /var/backups/mysql/sakila.sql
 ```
 ```bash
