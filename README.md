@@ -78,6 +78,13 @@ zip $backup_folder/$(date +%d-%m-%Y_%H-%M-%S).zip $binlogs_fullPath
 #удаляем сохраненные файлы журналов
 echo $binlog_Last | xargs -I % sudo mysql -E --execute='PURGE BINARY LOGS TO "%";' mysql
 ```
+```
+cron -e
+
+0 0 * * * sudo mysqldump --flush-logs --delete-master-logs --single-transaction --all-databases | gzip > /var/backups/mysql/full_$(date +%d-%m-%Y_%H-%M-%S).gz
+
+*/60 * * * * sudo bash ~/scripts/скрипт_инкрментального_бэкапа
+```
 3.1.* В каких случаях использование реплики будет давать преимущество по сравнению с обычным резервным копированием?
 
 #### Обеспечение непрерывного доступа к критически важным приложениям и приложениям, ориентированных на клиентов.
