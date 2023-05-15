@@ -54,7 +54,29 @@ ssh $ssh_restore 'pg_restore -U $dbUser $database $pathB/$dump_file'
 ### Задание 3. MySQL
 
 3.1. С помощью официальной документации приведите пример команды инкрементного резервного копирования базы данных MySQL. 
-
+```
+mysqldump --flush-logs --delete-master-logs --single-transaction --all-databases sakila > /var/backups/mysql/sakila.sql
+```
+```bash
+#путь к файлу с двоичными журналами
+binlogs_path=/var/log/mysql/
+#путь к каталогу с бэкапами
+backup_folder=/var/backups/mysql/
+#создаем новый двоичный журнал
+sudo mysql -E --execute='FLUSH BINARY LOGS;' mysql
+#получаем список журналов
+binlogs=$(sudo mysql -E --execute='SHOW BINARY LOGS;' mysql | grep Log_name | sed -e 's/Log_name://g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+#берем все, кроме последнего
+binlogs_without_Last=`echo "${binlogs}" | head -n -1`
+#отдельно последний, который не нужно копировать
+binlog_Last=`echo "${binlogs}" | tail -n -1`
+#формируем полный путь 
+binlogs_fullPath=`echo "${binlogs_without_Last}" | xargs -I % echo $binlogs_path%`
+#сжимаем журналы
+zip $backup_folder/$(date +%d-%m-%Y_%H-%M-%S).zip $binlogs_fullPath
+#удаляем сохраненные файлы журналов
+echo $binlog_Last | xargs -I % sudo mysql -E --execute='PURGE BINARY LOGS TO "%";' mysql
+```
 3.1.* В каких случаях использование реплики будет давать преимущество по сравнению с обычным резервным копированием?
 
 #### Обеспечение непрерывного доступа к критически важным приложениям и приложениям, ориентированных на клиентов.
