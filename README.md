@@ -81,7 +81,7 @@ echo $binlog_Last | xargs -I % sudo mysql -E --execute='PURGE BINARY LOGS TO "%"
 ```
 cron -e
 
-0 0 * * * sudo mysqldump --flush-logs --delete-master-logs --single-transaction --all-databases | gzip > /var/backups/mysql/full_$(date +%d-%m-%Y_%H-%M-%S).gz
+0 0 * * * sudo mysqldump --flush-logs --delete-master-logs --single-transaction --all-databases > /var/backups/mysql/sakila.sql
 
 */60 * * * * sudo bash ~/scripts/скрипт_инкрментального_бэкапа
 ```
